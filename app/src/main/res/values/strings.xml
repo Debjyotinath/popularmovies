@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="api_key"></string>
+    <string name="most_popular">Most Popular</string>
+    <string name="top_rated">Top Rated</string>
+    <string name="key_movie_list">key_parcel_movie_list</string>
+    <string name="key_movie_detail">key_parcel_movie_detail</string>
+    <string name="title_activity_movie_details">Movie Detail</string>
+    <string name="label_language">Language : </string>
+    <string name="close_bracket">)</string>
+    <string name="open_bracket">(</string>
+    <string name="lbl_vote"> Votes:</string>
+    <string name="lbl_overview"> Overview</string>
+    <string name="content_desc">Description</string>
+    <string name="transition_name">movie_image_thumbnail</string>
+</resources>
