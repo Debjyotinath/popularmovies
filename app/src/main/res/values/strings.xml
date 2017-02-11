@@ -15,4 +15,5 @@
     <string name="transition_name">movie_image_thumbnail</string>
     <string name="dateformat_yyyy_MM_dd">yyyy-MM-dd</string>
     <string name="dateformat_dd_MM_yyyy">dd-MM-yyyy</string>
+    <string name="dateformat_dd_MMMM_yyyy">dd MMMM, yyyy</string>
 </resources>

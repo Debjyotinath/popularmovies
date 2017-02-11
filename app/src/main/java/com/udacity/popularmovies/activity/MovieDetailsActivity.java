@@ -5,6 +5,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -56,10 +57,19 @@ public class MovieDetailsActivity extends AppCompatActivity {
         setValues();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void setValues()
     {
         SimpleDateFormat dateFormat=new SimpleDateFormat(getString(R.string.dateformat_yyyy_MM_dd));
-        SimpleDateFormat formatTo=new SimpleDateFormat(getString(R.string.dateformat_dd_MM_yyyy));
+        SimpleDateFormat formatTo=new SimpleDateFormat(getString(R.string.dateformat_dd_MMMM_yyyy));
         if(popularMoviePOJO!=null)
         {
             Glide.with(this)

@@ -1,9 +1,11 @@
 package com.udacity.popularmovies.activity;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -42,7 +44,7 @@ public class MovieListActivity extends AppCompatActivity {
             moviePOJOs=savedInstanceState.getParcelableArrayList(getString(R.string.key_movie_list));
         if(moviePOJOs==null)
             moviePOJOs=new ArrayList<>();
-        recyclerView.setLayoutManager(new GridLayoutManager(this,2));
+        recyclerView.setLayoutManager(new GridLayoutManager(this,calculateNoOfColumns(getBaseContext())));
         recyclerView.setHasFixedSize(true);
         viewAdapter=new RecyclerViewAdapter(MovieListActivity.this,moviePOJOs);
         recyclerView.setAdapter(viewAdapter);
@@ -108,5 +110,12 @@ public class MovieListActivity extends AppCompatActivity {
         public void onFailure(Call<ResponseBody> call, Throwable t) {
 
         }
+    }
+
+    public static int calculateNoOfColumns(Context context) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        int noOfColumns = (int) (dpWidth / 180);
+        return noOfColumns;
     }
 }

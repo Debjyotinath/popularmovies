@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="detail_page_title_text">18sp</dimen>
+    <dimen name="dp5">5dp</dimen>
+    <dimen name="dp16">16dp</dimen>
+    <dimen name="dp8">8dp</dimen>
+    <item name="alpha_background" format="float" type="dimen">0.8</item>
+    <dimen name="dp2">2dp</dimen>
+    <dimen name="dp0">0dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="detail_thumbnail_image_h">140dp</dimen>
+    <dimen name="detail_thumbnail_image_w">121dp</dimen>
+    <dimen name="detail_top_image_h">200dp</dimen>
+    <dimen name="detail_item_info_w">280dp</dimen>
+    <dimen name="title_text_size">15sp</dimen>
 </resources>

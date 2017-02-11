@@ -20,11 +20,8 @@
         </activity>
         <activity
             android:name=".activity.MovieDetailsActivity"
-            android:parentActivityName=".activity.MovieListActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.udacity.popularmovies.activity.MovieListActivity" />
+
         </activity>
     </application>
 
