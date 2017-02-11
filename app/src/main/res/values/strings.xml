@@ -13,4 +13,6 @@
     <string name="lbl_overview"> Overview</string>
     <string name="content_desc">Description</string>
     <string name="transition_name">movie_image_thumbnail</string>
+    <string name="dateformat_yyyy_MM_dd">yyyy-MM-dd</string>
+    <string name="dateformat_dd_MM_yyyy">dd-MM-yyyy</string>
 </resources>

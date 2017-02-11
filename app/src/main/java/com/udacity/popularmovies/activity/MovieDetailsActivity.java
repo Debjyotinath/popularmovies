@@ -58,8 +58,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     private void setValues()
     {
-        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat formatTo=new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat dateFormat=new SimpleDateFormat(getString(R.string.dateformat_yyyy_MM_dd));
+        SimpleDateFormat formatTo=new SimpleDateFormat(getString(R.string.dateformat_dd_MM_yyyy));
         if(popularMoviePOJO!=null)
         {
             Glide.with(this)
