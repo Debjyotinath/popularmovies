@@ -11,6 +11,7 @@ import android.view.MenuItem;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.udacity.popularmovies.BuildConfig;
 import com.udacity.popularmovies.R;
 import com.udacity.popularmovies.adapter.RecyclerViewAdapter;
 import com.udacity.popularmovies.controller.Controller;
@@ -35,6 +36,8 @@ public class MovieListActivity extends AppCompatActivity {
 
     RecyclerViewAdapter viewAdapter;
     ArrayList<PopularMoviePOJO> moviePOJOs;
+
+    public static final String API_KEY= BuildConfig.API_KEY;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,7 +87,7 @@ public class MovieListActivity extends AppCompatActivity {
     private void getMovies(boolean topRated)
     {
         Controller controller=Controller.getInstance();
-        controller.getMovies(getString(R.string.api_key),topRated,new MovieResponse());
+        controller.getMovies(API_KEY,topRated,new MovieResponse());
     }
 
     class MovieResponse implements Callback<ResponseBody>
