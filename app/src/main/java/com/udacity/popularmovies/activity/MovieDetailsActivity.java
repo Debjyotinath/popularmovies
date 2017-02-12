@@ -45,7 +45,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        Bundle bundle=getIntent().getExtras();
+        Bundle bundle=getIntent()!=null?getIntent().getExtras():null;
         if(bundle!=null)
         {
             popularMoviePOJO=bundle.getParcelable(getString(R.string.key_movie_detail));
