@@ -247,14 +247,16 @@
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
+                    <ProgressBar
+                        android:layout_margin="@dimen/dp8"
+                        android:id="@+id/tariler_list_progress_bar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/trailer_horizontal_scroll_recycler_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
-                    <ProgressBar
-                        android:id="@+id/tariler_list_progress_bar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+
                 </RelativeLayout>
 
             </LinearLayout>

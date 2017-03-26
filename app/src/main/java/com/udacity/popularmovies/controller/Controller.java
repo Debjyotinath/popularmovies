@@ -28,6 +28,8 @@ public class Controller {
     public static final String TOPRATED_URL="3/movie/top_rated";
     public static final String MOST_POPULAR_URL="3/movie/popular";
     public static final String IMAGE_URL="http://image.tmdb.org/t/p/w780/";
+    public static final String VIDEO_LIST_URL="3/movie/{id}/videos";
+    public static final String REVIEW_LIST_URL="3/movie/{id}/reviews";
 
 
     private static final Retrofit retrofit=buildRetrofit();
@@ -81,6 +83,16 @@ public class Controller {
             responseCall=service.getTopRatedMovies(parameterHashMap);
         else
             responseCall=service.getPopularMovies(parameterHashMap);
+        responseCall.enqueue(bodyCallback);
+    }
+
+    public void getMovieTrailerList(String key,String movieId, Callback<ResponseBody> bodyCallback)
+    {
+        MoviesService service = retrofit.create(MoviesService.class);
+        Call<ResponseBody> responseCall=null;
+        HashMap<String,String> parameterHashMap=new HashMap<>();
+        parameterHashMap.put("api_key",key);
+        responseCall=service.getVideoList(movieId,parameterHashMap);
         responseCall.enqueue(bodyCallback);
     }
     public static Retrofit buildRetrofit()

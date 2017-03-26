@@ -4,6 +4,7 @@
     <string name="top_rated">Top Rated</string>
     <string name="key_movie_list">key_parcel_movie_list</string>
     <string name="key_movie_detail">key_parcel_movie_detail</string>
+    <string name="key_movie_trailers">key_parcel_movie_trailers</string>
     <string name="title_activity_movie_details">Movie Detail</string>
     <string name="label_language">Language : </string>
     <string name="close_bracket">)</string>
@@ -110,4 +111,5 @@
     <string name="fav">Favorite</string>
     <string name="lbl_trailer">Trailer</string>
     <string name="lbl_review">Review</string>
+    <string name="youtube_image_url">http://img.youtube.com/vi/%1$s/0.jpg</string>
 </resources>

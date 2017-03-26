@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -16,17 +17,31 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.udacity.popularmovies.BuildConfig;
 import com.udacity.popularmovies.R;
+import com.udacity.popularmovies.adapter.TrailerRecyclerViewAdapter;
 import com.udacity.popularmovies.controller.Controller;
 import com.udacity.popularmovies.data.MovieContract;
 import com.udacity.popularmovies.model.LanguageEnum;
 import com.udacity.popularmovies.model.PopularMoviePOJO;
+import com.udacity.popularmovies.model.TrailerVideoPOJO;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MovieDetailsActivity extends AppCompatActivity {
 
@@ -42,9 +57,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @BindView(R.id.fab)FloatingActionButton favMovie;
     @BindView(R.id.trailer_horizontal_scroll_recycler_view)RecyclerView trailerContainer;
     @BindView(R.id.tariler_list_progress_bar)ProgressBar trailerListLoading;
+    TrailerRecyclerViewAdapter trailerRecyclerViewAdapter;
     Uri CONTENT_URI= null;
 
     PopularMoviePOJO popularMoviePOJO;
+    ArrayList<TrailerVideoPOJO> trailerVideoPOJOArrayList;
+
+    Controller controller;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +74,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Bundle bundle=getIntent()!=null?getIntent().getExtras():null;
+        trailerVideoPOJOArrayList=new ArrayList<>();
         if(bundle!=null)
         {
             popularMoviePOJO=bundle.getParcelable(getString(R.string.key_movie_detail));
@@ -62,6 +82,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         else if(savedInstanceState!=null && savedInstanceState.containsKey(getString(R.string.key_movie_detail)))
         {
             popularMoviePOJO=savedInstanceState.getParcelable(getString(R.string.key_movie_detail));
+            trailerVideoPOJOArrayList=savedInstanceState.getParcelableArrayList(getString(R.string.key_movie_trailers));
         }
         CONTENT_URI=MovieContract.MovieEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(popularMoviePOJO.getId()))
                 .build();
@@ -87,6 +108,20 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
         });
         setValues();
+        trailerRecyclerViewAdapter=new TrailerRecyclerViewAdapter(this,trailerVideoPOJOArrayList);
+        trailerContainer.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
+        trailerContainer.setAdapter(trailerRecyclerViewAdapter);
+
+        controller=Controller.getInstance();
+        if(trailerVideoPOJOArrayList==null || trailerVideoPOJOArrayList.isEmpty()) {
+            trailerListLoading.setVisibility(View.VISIBLE);
+            controller.getMovieTrailerList(BuildConfig.API_KEY, String.valueOf(popularMoviePOJO.getId()), new VideoListResponseListener());
+        }
+        else
+        {
+            trailerListLoading.setVisibility(View.GONE);
+        }
+
     }
 
     private void setMovieFavImage(boolean isFav)
@@ -109,6 +144,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(getString(R.string.key_movie_detail),popularMoviePOJO);
+        outState.putParcelableArrayList(getString(R.string.key_movie_trailers),trailerVideoPOJOArrayList);
     }
 
     private void setValues()
@@ -195,6 +231,36 @@ public class MovieDetailsActivity extends AppCompatActivity {
             {
                 setMovieFavImage(true);
             }
+        }
+    }
+
+    private class VideoListResponseListener implements Callback<ResponseBody> {
+        @Override
+        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            JSONObject jsonObject=Controller.getJsonResponseFromRaw(response);
+            if(jsonObject!=null)
+            {
+                JSONArray jsonArray=jsonObject.optJSONArray("results");
+                if(jsonArray!=null)
+                {
+                    Gson gson=new Gson();
+                    trailerVideoPOJOArrayList=new ArrayList<>();
+                    ArrayList<TrailerVideoPOJO> trailerVideoPOJOArrayListNew=gson.fromJson(jsonArray.toString(),new TypeToken<List<TrailerVideoPOJO>>(){}.getType());
+                    for(TrailerVideoPOJO trailerVideoPOJO:trailerVideoPOJOArrayListNew)
+                    {
+                        if(trailerVideoPOJO.getType().equals("Trailer"))
+                        trailerVideoPOJOArrayList.add(trailerVideoPOJO);
+                    }
+                    trailerRecyclerViewAdapter.setTrailerList(trailerVideoPOJOArrayList);
+                    trailerRecyclerViewAdapter.notifyDataSetChanged();
+                    trailerListLoading.setVisibility(View.GONE);
+                }
+            }
+        }
+
+        @Override
+        public void onFailure(Call<ResponseBody> call, Throwable t) {
+
         }
     }
 }

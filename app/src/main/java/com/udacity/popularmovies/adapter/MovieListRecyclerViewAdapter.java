@@ -1,7 +1,6 @@
 package com.udacity.popularmovies.adapter;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -28,13 +27,13 @@ import butterknife.ButterKnife;
  * Created by debjyotinath on 10/02/17.
  */
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolderItem> {
+public class MovieListRecyclerViewAdapter extends RecyclerView.Adapter<MovieListRecyclerViewAdapter.ViewHolderItem> {
 
     LayoutInflater layoutInflater;
     ArrayList<PopularMoviePOJO> movieList;
     Activity activity;
 
-    public RecyclerViewAdapter(Activity activity, ArrayList<PopularMoviePOJO> movieList) {
+    public MovieListRecyclerViewAdapter(Activity activity, ArrayList<PopularMoviePOJO> movieList) {
         layoutInflater=LayoutInflater.from(activity);
         this.activity = activity;
         this.movieList=movieList;
@@ -45,7 +44,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     @Override
-    public RecyclerViewAdapter.ViewHolderItem onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MovieListRecyclerViewAdapter.ViewHolderItem onCreateViewHolder(ViewGroup parent, int viewType) {
         View view=layoutInflater.inflate(R.layout.list_item,parent,false);
         ViewHolderItem viewHolderItem=new ViewHolderItem(view);
 
@@ -53,7 +52,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerViewAdapter.ViewHolderItem holder, int position) {
+    public void onBindViewHolder(final MovieListRecyclerViewAdapter.ViewHolderItem holder, int position) {
 
         final PopularMoviePOJO popularMoviePOJO=movieList.get(position);
         if(popularMoviePOJO!=null)

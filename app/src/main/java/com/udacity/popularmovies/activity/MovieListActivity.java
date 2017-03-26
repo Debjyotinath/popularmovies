@@ -18,7 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.udacity.popularmovies.BuildConfig;
 import com.udacity.popularmovies.R;
-import com.udacity.popularmovies.adapter.RecyclerViewAdapter;
+import com.udacity.popularmovies.adapter.MovieListRecyclerViewAdapter;
 import com.udacity.popularmovies.controller.Controller;
 import com.udacity.popularmovies.data.MovieContract.MovieEntry;
 import com.udacity.popularmovies.model.PopularMoviePOJO;
@@ -40,7 +40,7 @@ public class MovieListActivity extends AppCompatActivity implements LoaderManage
 
     @BindView(R.id.recycler_view)RecyclerView recyclerView;
 
-    RecyclerViewAdapter viewAdapter;
+    MovieListRecyclerViewAdapter viewAdapter;
     ArrayList<PopularMoviePOJO> moviePOJOs;
 
     public static final String API_KEY= BuildConfig.API_KEY;
@@ -56,7 +56,7 @@ public class MovieListActivity extends AppCompatActivity implements LoaderManage
             moviePOJOs=new ArrayList<>();
         recyclerView.setLayoutManager(new GridLayoutManager(this,calculateNoOfColumns(getBaseContext())));
         recyclerView.setHasFixedSize(true);
-        viewAdapter=new RecyclerViewAdapter(MovieListActivity.this,moviePOJOs);
+        viewAdapter=new MovieListRecyclerViewAdapter(MovieListActivity.this,moviePOJOs);
         recyclerView.setAdapter(viewAdapter);
         if(moviePOJOs.isEmpty())
             getMovies(false);
