@@ -141,6 +141,8 @@ public class PopularMoviePOJO implements Parcelable{
     public PopularMoviePOJO(Parcel in) {
         readFromParcel(in);
     }
+    public PopularMoviePOJO() {
+    }
 
     @Override
     public int describeContents() {

@@ -1,18 +1,24 @@
 package com.udacity.popularmovies.activity;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.udacity.popularmovies.R;
 import com.udacity.popularmovies.controller.Controller;
+import com.udacity.popularmovies.data.MovieContract;
 import com.udacity.popularmovies.model.LanguageEnum;
 import com.udacity.popularmovies.model.PopularMoviePOJO;
 
@@ -33,7 +39,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @BindView(R.id.voter_count)TextView txtVoterCount;
     @BindView(R.id.overview_txt)TextView txtOverview;
     @BindView(R.id.language_txt)TextView txtLanguage;
-
+    @BindView(R.id.fab)FloatingActionButton favMovie;
+    @BindView(R.id.trailer_horizontal_scroll_recycler_view)RecyclerView trailerContainer;
+    @BindView(R.id.tariler_list_progress_bar)ProgressBar trailerListLoading;
+    Uri CONTENT_URI= null;
 
     PopularMoviePOJO popularMoviePOJO;
     @Override
@@ -54,9 +63,39 @@ public class MovieDetailsActivity extends AppCompatActivity {
         {
             popularMoviePOJO=savedInstanceState.getParcelable(getString(R.string.key_movie_detail));
         }
+        CONTENT_URI=MovieContract.MovieEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(popularMoviePOJO.getId()))
+                .build();
+
+        Cursor cursor=null;
+        ContentResolver contentResolver=this.getContentResolver();
+        if(popularMoviePOJO!=null)
+
+            //Check if the a record with the same id exists
+            cursor=contentResolver.query(CONTENT_URI,null,null,null,null);
+        if(cursor!=null && cursor.moveToNext())
+        {
+            setMovieFavImage(true);
+        }
+        else
+        {
+            setMovieFavImage(false);
+        }
+        favMovie.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                favButtonClickHandler();
+            }
+        });
         setValues();
     }
 
+    private void setMovieFavImage(boolean isFav)
+    {
+        if(isFav)
+            favMovie.setImageResource(R.drawable.ic_favorite);
+        else
+            favMovie.setImageResource(R.drawable.ic_favorite_border);
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId()==android.R.id.home) {
@@ -109,5 +148,53 @@ public class MovieDetailsActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         supportFinishAfterTransition();
+    }
+
+    private void favButtonClickHandler()
+    {
+        Cursor cursor=null;
+        ContentValues contentValues=new ContentValues();
+        ContentResolver contentResolver=this.getContentResolver();
+        if(popularMoviePOJO!=null)
+
+        //Check if the a record with the same id exists
+            cursor=contentResolver.query(CONTENT_URI,null,null,null,null);
+        if(cursor!=null && cursor.moveToNext())
+        {
+            //delete the entry
+            int id=contentResolver.delete(CONTENT_URI,null,null);
+            if(id!=-1)
+            {
+                setMovieFavImage(false);
+            }
+        }
+        else {
+            //else insert the record
+            contentValues.put(MovieContract.MovieEntry._ID,popularMoviePOJO.getId());
+            contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE,popularMoviePOJO.getTitle());
+            contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_IMAGE_PATH,popularMoviePOJO.getPoster_path());
+            contentValues.put(MovieContract.MovieEntry.COLUMN_ADULT,popularMoviePOJO.isAdult()?"1":"0");
+            contentValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW,popularMoviePOJO.getOverview());
+            contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE,popularMoviePOJO.getRelease_date());
+            String genreIdString="";
+            for(int genreId:popularMoviePOJO.getGenre_ids())
+            {
+                genreIdString=genreIdString+genreId+",";
+            }
+            genreIdString=genreIdString.substring(0,genreIdString.lastIndexOf(","));
+            contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_GENRE_IDS,genreIdString);
+            contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ORIGINAL_TITLE,popularMoviePOJO.getTitle());
+            contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ORIGINAL_LANGUAGE,popularMoviePOJO.getOriginal_language());
+            contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_BACKDROP_PATH,popularMoviePOJO.getBackdrop_path());
+            contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_POPULARITY,popularMoviePOJO.getPopularity());
+            contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_VIDEO,popularMoviePOJO.isVideo()?"1":"0");
+            contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE,popularMoviePOJO.getVote_average());
+            contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_COUNT,popularMoviePOJO.getVote_count());
+            Uri uri=contentResolver.insert(CONTENT_URI,contentValues);
+            if(uri!=null)
+            {
+                setMovieFavImage(true);
+            }
+        }
     }
 }
