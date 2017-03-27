@@ -21,56 +21,28 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.udacity.popularmovies.data.MovieContract.MovieEntry;
 
-/**
- * Manages a local database for weather data.
- */
+
 public class MovieDbHelper extends SQLiteOpenHelper {
 
-    /*
-     * This is the name of our database. Database names should be descriptive and end with the
-     * .db extension.
-     */
-    public static final String DATABASE_NAME = "weather.db";
 
-    /*
-     * If you change the database schema, you must increment the database version or the onUpgrade
-     * method will not be called.
-     *
-     * The reason DATABASE_VERSION starts at 3 is because Sunshine has been used in conjunction
-     * with the Android course for a while now. Believe it or not, older versions of Sunshine
-     * still exist out in the wild. If we started this DATABASE_VERSION off at 1, upgrading older
-     * versions of Sunshine could cause everything to break. Although that is certainly a rare
-     * use-case, we wanted to watch out for it and warn you what could happen if you mistakenly
-     * version your databases.
-     */
-    private static final int DATABASE_VERSION = 3;
+    public static final String DATABASE_NAME = "movie.db";
+
+
+    private static final int DATABASE_VERSION = 1;
 
     public MovieDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    /**
-     * Called when the database is created for the first time. This is where the creation of
-     * tables and the initial population of the tables should happen.
-     *
-     * @param sqLiteDatabase The database.
-     */
+
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
-        /*
-         * This String will contain a simple SQL statement that will create a table that will
-         * cache our weather data.
-         */
-        final String SQL_CREATE_WEATHER_TABLE =
+ String SQL_CREATE_WEATHER_TABLE =
 
                 "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
 
-                /*
-                 * WeatherEntry did not explicitly declare a column called "_ID". However,
-                 * WeatherEntry implements the interface, "BaseColumns", which does have a field
-                 * named "_ID". We use that here to designate our table's primary key.
-                 */
+
                 MovieEntry._ID               + " INTEGER PRIMARY KEY , " +
                 MovieEntry.COLUMN_MOVIE_TITLE       + " TEXT NOT NULL, "                 +
 
@@ -103,18 +75,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(SQL_CREATE_WEATHER_TABLE);
     }
 
-    /**
-     * This database is only a cache for online data, so its upgrade policy is simply to discard
-     * the data and call through to onCreate to recreate the table. Note that this only fires if
-     * you change the version number for your database (in our case, DATABASE_VERSION). It does NOT
-     * depend on the version number for your application found in your app/build.gradle file. If
-     * you want to update the schema without wiping data, commenting out the current body of this
-     * method should be your top priority before modifying this method.
-     *
-     * @param sqLiteDatabase Database that is being upgraded
-     * @param oldVersion     The old database version
-     * @param newVersion     The new database version
-     */
+
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
