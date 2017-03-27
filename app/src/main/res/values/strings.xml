@@ -112,4 +112,10 @@
     <string name="lbl_trailer">Trailer</string>
     <string name="lbl_review">Review</string>
     <string name="youtube_image_url">http://img.youtube.com/vi/%1$s/0.jpg</string>
+    <string name="key_movie_reviews">movie_review_list</string>
+    <string name="see_all_reviews">View all review</string>
+    <string name="title_activity_review_list">Movie Reviews</string>
+    <string name="key_movie_title">key_movie_title</string>
+    <string name="no_review">No review available</string>
+    <string name="key_movie_background_image_path">key_movie_background_image_path</string>
 </resources>

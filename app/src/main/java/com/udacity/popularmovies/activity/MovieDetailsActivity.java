@@ -2,6 +2,8 @@ package com.udacity.popularmovies.activity;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,9 +12,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -26,6 +31,7 @@ import com.udacity.popularmovies.controller.Controller;
 import com.udacity.popularmovies.data.MovieContract;
 import com.udacity.popularmovies.model.LanguageEnum;
 import com.udacity.popularmovies.model.PopularMoviePOJO;
+import com.udacity.popularmovies.model.ReviewPOJO;
 import com.udacity.popularmovies.model.TrailerVideoPOJO;
 
 import org.json.JSONArray;
@@ -35,6 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.Inflater;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,11 +64,14 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @BindView(R.id.fab)FloatingActionButton favMovie;
     @BindView(R.id.trailer_horizontal_scroll_recycler_view)RecyclerView trailerContainer;
     @BindView(R.id.tariler_list_progress_bar)ProgressBar trailerListLoading;
+    @BindView(R.id.review_parent_container)LinearLayout reviewContainer;
+    @BindView(R.id.view_all_reviews)TextView seeMoreReviews;
     TrailerRecyclerViewAdapter trailerRecyclerViewAdapter;
     Uri CONTENT_URI= null;
 
     PopularMoviePOJO popularMoviePOJO;
     ArrayList<TrailerVideoPOJO> trailerVideoPOJOArrayList;
+    ArrayList<ReviewPOJO> reviewPOJOArrayList;
 
     Controller controller;
     @Override
@@ -75,6 +85,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Bundle bundle=getIntent()!=null?getIntent().getExtras():null;
         trailerVideoPOJOArrayList=new ArrayList<>();
+        reviewPOJOArrayList=new ArrayList<>();
         if(bundle!=null)
         {
             popularMoviePOJO=bundle.getParcelable(getString(R.string.key_movie_detail));
@@ -83,6 +94,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         {
             popularMoviePOJO=savedInstanceState.getParcelable(getString(R.string.key_movie_detail));
             trailerVideoPOJOArrayList=savedInstanceState.getParcelableArrayList(getString(R.string.key_movie_trailers));
+            reviewPOJOArrayList=savedInstanceState.getParcelableArrayList(getString(R.string.key_movie_reviews));
         }
         CONTENT_URI=MovieContract.MovieEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(popularMoviePOJO.getId()))
                 .build();
@@ -115,12 +127,28 @@ public class MovieDetailsActivity extends AppCompatActivity {
         controller=Controller.getInstance();
         if(trailerVideoPOJOArrayList==null || trailerVideoPOJOArrayList.isEmpty()) {
             trailerListLoading.setVisibility(View.VISIBLE);
-            controller.getMovieTrailerList(BuildConfig.API_KEY, String.valueOf(popularMoviePOJO.getId()), new VideoListResponseListener());
+            controller.getMovieTrailerList(BuildConfig.API_KEY, String.valueOf(popularMoviePOJO.getId()), new NetworkCallResponseListener(true));
         }
         else
         {
             trailerListLoading.setVisibility(View.GONE);
         }
+
+        if(reviewPOJOArrayList!=null && !reviewPOJOArrayList.isEmpty())
+        {
+            showOnlyFiveReviewHere();
+        }
+        else
+        {
+            controller.getMovieReviewList(BuildConfig.API_KEY, String.valueOf(popularMoviePOJO.getId()), new NetworkCallResponseListener(false));
+        }
+
+        seeMoreReviews.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setOnClickReviewItem();
+            }
+        });
 
     }
 
@@ -145,6 +173,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putParcelable(getString(R.string.key_movie_detail),popularMoviePOJO);
         outState.putParcelableArrayList(getString(R.string.key_movie_trailers),trailerVideoPOJOArrayList);
+        outState.putParcelableArrayList(getString(R.string.key_movie_reviews),reviewPOJOArrayList);
     }
 
     private void setValues()
@@ -234,7 +263,14 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
     }
 
-    private class VideoListResponseListener implements Callback<ResponseBody> {
+    private class NetworkCallResponseListener implements Callback<ResponseBody> {
+
+        boolean isVideoList;
+
+        public NetworkCallResponseListener(boolean isVideoList) {
+            this.isVideoList = isVideoList;
+        }
+
         @Override
         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
             JSONObject jsonObject=Controller.getJsonResponseFromRaw(response);
@@ -244,16 +280,25 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 if(jsonArray!=null)
                 {
                     Gson gson=new Gson();
-                    trailerVideoPOJOArrayList=new ArrayList<>();
-                    ArrayList<TrailerVideoPOJO> trailerVideoPOJOArrayListNew=gson.fromJson(jsonArray.toString(),new TypeToken<List<TrailerVideoPOJO>>(){}.getType());
-                    for(TrailerVideoPOJO trailerVideoPOJO:trailerVideoPOJOArrayListNew)
-                    {
-                        if(trailerVideoPOJO.getType().equals("Trailer"))
-                        trailerVideoPOJOArrayList.add(trailerVideoPOJO);
+                    if(isVideoList) {
+                        trailerVideoPOJOArrayList = new ArrayList<>();
+                        ArrayList<TrailerVideoPOJO> trailerVideoPOJOArrayListNew = gson.fromJson(jsonArray.toString(), new TypeToken<List<TrailerVideoPOJO>>() {
+                        }.getType());
+                        for (TrailerVideoPOJO trailerVideoPOJO : trailerVideoPOJOArrayListNew) {
+                            if (trailerVideoPOJO.getType().equals("Trailer"))
+                                trailerVideoPOJOArrayList.add(trailerVideoPOJO);
+                        }
+                        trailerRecyclerViewAdapter.setTrailerList(trailerVideoPOJOArrayList);
+                        trailerRecyclerViewAdapter.notifyDataSetChanged();
+                        trailerListLoading.setVisibility(View.GONE);
                     }
-                    trailerRecyclerViewAdapter.setTrailerList(trailerVideoPOJOArrayList);
-                    trailerRecyclerViewAdapter.notifyDataSetChanged();
-                    trailerListLoading.setVisibility(View.GONE);
+                    else
+                    {
+                        reviewPOJOArrayList = new ArrayList<>();
+                        reviewPOJOArrayList = gson.fromJson(jsonArray.toString(), new TypeToken<List<ReviewPOJO>>() {
+                        }.getType());
+                        showOnlyFiveReviewHere();
+                    }
                 }
             }
         }
@@ -262,5 +307,69 @@ public class MovieDetailsActivity extends AppCompatActivity {
         public void onFailure(Call<ResponseBody> call, Throwable t) {
 
         }
+    }
+
+    private void showOnlyFiveReviewHere()
+    {
+
+        if(reviewPOJOArrayList.size()>5)
+        {
+            seeMoreReviews.setVisibility(View.VISIBLE);
+            for(int i=0;i<5;i++)
+            {
+                ReviewPOJO reviewPOJO=reviewPOJOArrayList.get(i);
+                View view=new ReviewLayout(this,reviewPOJO.getAuthor(),reviewPOJO.getContent());
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        setOnClickReviewItem();
+                    }
+                });
+                reviewContainer.addView(view);
+            }
+        }
+        else {
+            seeMoreReviews.setVisibility(View.GONE);
+            for(ReviewPOJO reviewPOJO:reviewPOJOArrayList)
+            {
+                View view=new ReviewLayout(this,reviewPOJO.getAuthor(),reviewPOJO.getContent());
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        setOnClickReviewItem();
+                    }
+                });
+                reviewContainer.addView(view);
+            }
+        }
+
+
+    }
+
+    private void setOnClickReviewItem()
+    {
+        Intent intent=new Intent(this,ReviewListActivity.class);
+        Bundle bundle=new Bundle();
+        bundle.putParcelableArrayList(getString(R.string.key_movie_reviews),reviewPOJOArrayList);
+        bundle.putString(getString(R.string.key_movie_background_image_path),popularMoviePOJO.getPoster_path());
+        bundle.putString(getString(R.string.key_movie_title),popularMoviePOJO.getTitle());
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
+    class ReviewLayout extends LinearLayout{
+
+        @BindView(R.id.review_author)TextView txtReviewAuthorName;
+        @BindView(R.id.review_content)TextView txtReviewContent;
+        public ReviewLayout(Context context,String author,String content) {
+            super(context);
+            LayoutInflater.from(context).inflate(R.layout.review_item_layout,this);
+            ButterKnife.bind(this);
+            txtReviewAuthorName.setText("- "+author);
+            txtReviewContent.setText("\""+content+"\"");
+            txtReviewContent.setLines(4);
+            txtReviewContent.setEllipsize(TextUtils.TruncateAt.END);
+        }
+
     }
 }

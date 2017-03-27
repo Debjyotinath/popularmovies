@@ -94,6 +94,14 @@ public class Controller {
         parameterHashMap.put("api_key",key);
         responseCall=service.getVideoList(movieId,parameterHashMap);
         responseCall.enqueue(bodyCallback);
+    }public void getMovieReviewList(String key,String movieId, Callback<ResponseBody> bodyCallback)
+    {
+        MoviesService service = retrofit.create(MoviesService.class);
+        Call<ResponseBody> responseCall=null;
+        HashMap<String,String> parameterHashMap=new HashMap<>();
+        parameterHashMap.put("api_key",key);
+        responseCall=service.getReviewList(movieId,parameterHashMap);
+        responseCall.enqueue(bodyCallback);
     }
     public static Retrofit buildRetrofit()
     {

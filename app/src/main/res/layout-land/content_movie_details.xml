@@ -286,6 +286,19 @@
             android:background="@color/grey"
             android:layout_width="match_parent"
             android:layout_height="1dp"/>
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/review_parent_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/view_all_reviews"
+            android:textAlignment="textEnd"
+            android:textColor="@color/white"
+            android:padding="10dp"
+            android:text="@string/see_all_reviews"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 </RelativeLayout>

@@ -23,9 +23,17 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <provider
-            android:authorities="com.udacity.popularmovies.debjyoti"
             android:name=".data.MovieProvider"
-            android:exported="false"/>
+            android:authorities="com.udacity.popularmovies.debjyoti"
+            android:exported="false" />
+
+        <activity
+            android:name=".activity.ReviewListActivity"
+            android:label="@string/title_activity_review_list"
+
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
     </application>
 
 </manifest>
